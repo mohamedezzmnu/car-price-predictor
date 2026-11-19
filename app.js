@@ -48,7 +48,19 @@ const BRAND_CATEGORIES = {
   "GMC": ["Jeep", "Pickup", "Minivan", "Microbus"]
 };
 
-// Suggested drivetrain per Category
+// Default drivetrain per Manufacturer when changed
+const BRAND_DEFAULT_DRIVE = {
+  "JEEP": "4x4",
+  "HUMMER": "4x4",
+  "LAND ROVER": "4x4",
+  "UAZ": "4x4",
+  "SUBARU": "4x4",
+  "TESLA": "4x4",
+  "FERRARI": "Rear",
+  "ASTON MARTIN": "Rear"
+};
+
+// Default drivetrain per Category when changed
 const CATEGORY_DEFAULT_DRIVE = {
   "Jeep": "4x4",
   "Pickup": "4x4",
@@ -170,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const res = await fetch("model.json");
     MODEL = await res.json();
-    currentState = enforceEngineeringFilters(currentState, { syncDrive: false });
+    currentState = enforceEngineeringFilters(currentState, { syncDrive: "none" });
     applyStateToForm(currentState);
     updatePrediction();
     renderComparison();
@@ -212,7 +224,7 @@ function fillSelect(id, items, labelFn = (v) => v) {
 // 2. Engineering Filter & Sanity Guard
 // ==========================================================================
 function enforceEngineeringFilters(state, opts = {}) {
-  const { syncDrive = false, notifyOnAdjust = false } = opts;
+  const { syncDrive = "none", notifyOnAdjust = false } = opts;
   const next = { ...state };
   const notes = [];
 
@@ -233,7 +245,7 @@ function enforceEngineeringFilters(state, opts = {}) {
   } else if (vol <= 2.3) {
     minCyl = 3;
     maxCyl = 6;
-  } else if (vol <= 3.8) {
+  } else if (vol <= 4.0) {
     minCyl = 4;
     maxCyl = 8;
   } else {
@@ -259,8 +271,10 @@ function enforceEngineeringFilters(state, opts = {}) {
     next.Mileage = minSaneMileage;
   }
 
-  // 4) Optional drivetrain alignment when user changes Category explicitly
-  if (syncDrive && CATEGORY_DEFAULT_DRIVE[next.Category]) {
+  // 4) Drivetrain alignment based on what changed
+  if (syncDrive === "brand" && BRAND_DEFAULT_DRIVE[next.Manufacturer]) {
+    next.DriveWheels = BRAND_DEFAULT_DRIVE[next.Manufacturer];
+  } else if (syncDrive === "category" && CATEGORY_DEFAULT_DRIVE[next.Category]) {
     next.DriveWheels = CATEGORY_DEFAULT_DRIVE[next.Category];
   }
 
@@ -516,7 +530,7 @@ function bindUIEvents() {
   document.getElementById("manufacturer").addEventListener("change", (e) => {
     currentState.Manufacturer = e.target.value;
     currentState = enforceEngineeringFilters(currentState, {
-      syncDrive: false,
+      syncDrive: "brand",
       notifyOnAdjust: true
     });
     clearActivePreset();
@@ -527,7 +541,7 @@ function bindUIEvents() {
   document.getElementById("category").addEventListener("change", (e) => {
     currentState.Category = e.target.value;
     currentState = enforceEngineeringFilters(currentState, {
-      syncDrive: true,
+      syncDrive: "category",
       notifyOnAdjust: false
     });
     clearActivePreset();
@@ -558,7 +572,7 @@ function bindUIEvents() {
       clearActivePreset();
       if (key === "EngineVolume" || key === "ProdYear") {
         currentState = enforceEngineeringFilters(currentState, {
-          syncDrive: false,
+          syncDrive: "none",
           notifyOnAdjust: false
         });
         applyStateToForm(currentState);
@@ -602,14 +616,14 @@ function bindUIEvents() {
       if (!PRESETS[key]) return;
       document.querySelectorAll(".preset-chip").forEach((c) => c.classList.remove("active"));
       chip.classList.add("active");
-      currentState = enforceEngineeringFilters({ ...PRESETS[key] }, { syncDrive: false });
+      currentState = enforceEngineeringFilters({ ...PRESETS[key] }, { syncDrive: "none" });
       applyStateToForm(currentState);
       updatePrediction();
     });
   });
 
   document.getElementById("resetBtn").addEventListener("click", () => {
-    currentState = enforceEngineeringFilters({ ...PRESETS.toyota }, { syncDrive: false });
+    currentState = enforceEngineeringFilters({ ...PRESETS.toyota }, { syncDrive: "none" });
     document.querySelectorAll(".preset-chip").forEach((c) => {
       c.classList.toggle("active", c.dataset.preset === "toyota");
     });
