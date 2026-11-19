@@ -1,6 +1,6 @@
 /* ==========================================================================
    CarPulse — Client-Side Linear Regression Engine & Liquid Glass UI
-   Comprehensive Domain Taxonomy (All 61 Manufacturers), Sanity Guards & EGP Display
+   Full Cascading Brand -> Category / Fuel / Gearbox / Drive / Engine Sync
    ========================================================================== */
 
 const REFERENCE_YEAR = 2026;
@@ -31,7 +31,7 @@ const GEAR_BOXES = [
   "Automatic", "Manual", "Tiptronic", "Variator"
 ];
 
-// Complete Brand -> Allowed Body Categories mapping across ALL 61 manufacturers
+// Complete Brand -> Allowed Body Categories (Ordered with Primary Flagship Category First)
 const BRAND_CATEGORIES = {
   "ACURA": ["Sedan", "Jeep", "Coupe", "Hatchback"],
   "ALFA ROMEO": ["Sedan", "Hatchback", "Coupe", "Cabriolet", "Jeep"],
@@ -49,7 +49,7 @@ const BRAND_CATEGORIES = {
   "FERRARI": ["Coupe", "Cabriolet"],
   "FIAT": ["Hatchback", "Sedan", "Minivan", "Microbus", "Goods wagon", "Cabriolet", "Jeep"],
   "FORD": ["Sedan", "Jeep", "Hatchback", "Pickup", "Minivan", "Microbus", "Goods wagon", "Coupe", "Cabriolet", "Universal"],
-  "GAZ": ["Sedan", "Pickup", "Microbus", "Goods wagon", "Universal"],
+  "GAZ": ["Microbus", "Pickup", "Goods wagon", "Sedan", "Universal"],
   "GMC": ["Jeep", "Pickup", "Minivan", "Microbus", "Goods wagon"],
   "GREATWALL": ["Jeep", "Pickup", "Sedan", "Hatchback"],
   "HAVAL": ["Jeep", "Pickup"],
@@ -75,7 +75,7 @@ const BRAND_CATEGORIES = {
   "OPEL": ["Sedan", "Hatchback", "Universal", "Minivan", "Microbus", "Goods wagon", "Jeep", "Cabriolet"],
   "PEUGEOT": ["Hatchback", "Sedan", "Universal", "Minivan", "Microbus", "Goods wagon", "Jeep", "Cabriolet"],
   "PONTIAC": ["Sedan", "Coupe", "Hatchback", "Minivan", "Cabriolet"],
-  "PORSCHE": ["Jeep", "Coupe", "Cabriolet", "Sedan", "Universal"],
+  "PORSCHE": ["Coupe", "Jeep", "Cabriolet", "Sedan", "Universal"],
   "RENAULT": ["Sedan", "Hatchback", "Universal", "Minivan", "Microbus", "Goods wagon", "Jeep"],
   "ROVER": ["Sedan", "Hatchback", "Universal", "Jeep", "Cabriolet"],
   "SAAB": ["Sedan", "Universal", "Cabriolet", "Coupe"],
@@ -96,7 +96,7 @@ const BRAND_CATEGORIES = {
   "სხვა": CATEGORIES
 };
 
-// Complete Brand -> Allowed Fuel Types mapping
+// Complete Brand -> Allowed Fuel Types
 const BRAND_FUEL_TYPES = {
   "TESLA": ["Plug-in Hybrid", "Hybrid"],
   "FERRARI": ["Petrol", "Hybrid", "Plug-in Hybrid"],
@@ -113,12 +113,11 @@ const BRAND_FUEL_TYPES = {
   "ISUZU": ["Diesel", "Petrol"]
 };
 
-// Complete Brand -> Allowed Gearboxes mapping
+// Complete Brand -> Allowed Gearboxes
 const BRAND_GEAR_BOXES = {
   "TESLA": ["Automatic"],
   "FERRARI": ["Automatic", "Tiptronic"],
   "ASTON MARTIN": ["Automatic", "Tiptronic", "Manual"],
-  "ROLLS-ROYCE": ["Automatic"],
   "HUMMER": ["Automatic", "Tiptronic"],
   "UAZ": ["Manual", "Automatic"],
   "VAZ": ["Manual", "Automatic", "Variator"],
@@ -141,7 +140,12 @@ const BRAND_DEFAULT_DRIVE = {
   "MASERATI": "Rear",
   "JAGUAR": "Rear",
   "BMW": "Rear",
-  "MERCEDES-BENZ": "Rear"
+  "MERCEDES-BENZ": "Rear",
+  "PORSCHE": "Rear",
+  "INFINITI": "Rear",
+  "LEXUS": "Rear",
+  "CADILLAC": "Rear",
+  "LINCOLN": "Rear"
 };
 
 // Default drivetrain per Category when changed
@@ -343,14 +347,14 @@ function fillSelect(id, items, labelFn = (v) => v) {
 }
 
 // ==========================================================================
-// 2. Engineering Filter & Sanity Guard (All Brands, Categories, Fuel, Engine, Age)
+// 2. Engineering Filter & Sanity Guard (Universal Across All Brands & Specs)
 // ==========================================================================
 function enforceEngineeringFilters(state, opts = {}) {
   const { syncDrive = "none", notifyOnAdjust = false } = opts;
   const next = { ...state };
   const notes = [];
 
-  // 1) Manufacturer -> Category cascading filter across all 61 brands
+  // 1) Manufacturer -> Category cascading filter
   const allowedCats = getAllowedCategories(next.Manufacturer);
   if (!allowedCats.includes(next.Category)) {
     next.Category = allowedCats[0];
@@ -371,9 +375,10 @@ function enforceEngineeringFilters(state, opts = {}) {
     notes.push(`تم ضبط ناقل الحركة إلى ${next.GearBox} لتناسب ${next.Manufacturer}`);
   }
 
-  // 4) Category -> Doors alignment (Coupe/Cabriolet default to 2 doors if currently 5)
+  // 4) Category -> Doors alignment
   if ((next.Category === "Coupe" || next.Category === "Cabriolet") && Number(next.Doors) === 5) {
     next.Doors = 2;
+    notes.push(`تم ضبط الأبواب إلى 2 باب لفئة ${next.Category}`);
   }
 
   // 5) Cylinders sane range relative to EngineVolume
@@ -413,18 +418,29 @@ function enforceEngineeringFilters(state, opts = {}) {
   }
 
   // 7) Drivetrain alignment based on brand or category
+  const prevDrive = next.DriveWheels;
   if (syncDrive === "brand") {
     if (BRAND_DEFAULT_DRIVE[next.Manufacturer]) {
       next.DriveWheels = BRAND_DEFAULT_DRIVE[next.Manufacturer];
     } else if (CATEGORY_DEFAULT_DRIVE[next.Category]) {
       next.DriveWheels = CATEGORY_DEFAULT_DRIVE[next.Category];
     }
+    if (next.DriveWheels !== prevDrive && notes.length === 0) {
+      notes.push(`تم تحديث الفئات (${allowedCats.length}) وضبط الدفع إلى ${next.DriveWheels} لـ ${next.Manufacturer}`);
+    }
   } else if (syncDrive === "category" && CATEGORY_DEFAULT_DRIVE[next.Category]) {
     next.DriveWheels = CATEGORY_DEFAULT_DRIVE[next.Category];
+    if (next.DriveWheels !== prevDrive && notes.length === 0) {
+      notes.push(`تم ضبط الدفع إلى ${next.DriveWheels} لفئة ${next.Category}`);
+    }
   }
 
-  if (notifyOnAdjust && notes.length > 0) {
-    showToast(notes[0]);
+  if (notifyOnAdjust) {
+    if (notes.length > 0) {
+      showToast(notes[0]);
+    } else if (syncDrive === "brand") {
+      showToast(`فلتر ${next.Manufacturer}: ${allowedCats.length} فئات • ${allowedFuels.length} وقود`);
+    }
   }
 
   return next;
@@ -710,7 +726,7 @@ function bindUIEvents() {
     currentState.Category = e.target.value;
     currentState = enforceEngineeringFilters(currentState, {
       syncDrive: "category",
-      notifyOnAdjust: false
+      notifyOnAdjust: true
     });
     clearActivePreset();
     applyStateToForm(currentState);
@@ -741,7 +757,7 @@ function bindUIEvents() {
       if (key === "EngineVolume" || key === "ProdYear") {
         currentState = enforceEngineeringFilters(currentState, {
           syncDrive: "none",
-          notifyOnAdjust: false
+          notifyOnAdjust: true
         });
         applyStateToForm(currentState);
       } else {
