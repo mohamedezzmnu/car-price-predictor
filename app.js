@@ -1,5 +1,6 @@
 /* ==========================================================================
    CarPulse — Client-Side Linear Regression Engine & Liquid Glass UI
+   With Cascading Domain Filters & Engineering Sanity Constraints
    ========================================================================== */
 
 const REFERENCE_YEAR = 2026;
@@ -28,6 +29,39 @@ const FUEL_TYPES = [
 const GEAR_BOXES = [
   "Automatic", "Manual", "Tiptronic", "Variator"
 ];
+
+// Cascading rules: Manufacturer -> allowed Categories
+const BRAND_CATEGORIES = {
+  "FERRARI": ["Coupe", "Cabriolet"],
+  "ASTON MARTIN": ["Coupe", "Cabriolet", "Sedan"],
+  "TESLA": ["Sedan", "Jeep", "Hatchback", "Coupe"],
+  "JEEP": ["Jeep", "Pickup"],
+  "HUMMER": ["Jeep", "Pickup"],
+  "LAND ROVER": ["Jeep"],
+  "PORSCHE": ["Jeep", "Coupe", "Cabriolet", "Sedan"],
+  "MINI": ["Hatchback", "Cabriolet", "Jeep", "Universal"],
+  "GAZ": ["Pickup", "Microbus", "Goods wagon", "Sedan"],
+  "UAZ": ["Jeep", "Pickup", "Microbus"],
+  "VAZ": ["Sedan", "Hatchback", "Universal", "Jeep"],
+  "ZAZ": ["Sedan", "Hatchback"],
+  "ISUZU": ["Pickup", "Jeep", "Microbus", "Goods wagon"],
+  "GMC": ["Jeep", "Pickup", "Minivan", "Microbus"]
+};
+
+// Suggested drivetrain per Category
+const CATEGORY_DEFAULT_DRIVE = {
+  "Jeep": "4x4",
+  "Pickup": "4x4",
+  "Cabriolet": "Rear",
+  "Coupe": "Rear",
+  "Sedan": "Front",
+  "Hatchback": "Front",
+  "Minivan": "Front",
+  "Microbus": "Front",
+  "Goods wagon": "Front",
+  "Limousine": "Rear",
+  "Universal": "Front"
+};
 
 const PRESETS = {
   toyota: {
@@ -136,6 +170,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const res = await fetch("model.json");
     MODEL = await res.json();
+    currentState = enforceEngineeringFilters(currentState, { syncDrive: false });
     applyStateToForm(currentState);
     updatePrediction();
     renderComparison();
@@ -149,9 +184,21 @@ function populateDropdowns() {
   fillSelect("manufacturer", MANUFACTURERS, (val) =>
     val === "სხვა" ? "Other (أخرى)" : val
   );
-  fillSelect("category", CATEGORIES);
+  syncCategoryOptionsForBrand(currentState.Manufacturer, currentState.Category);
   fillSelect("fuelType", FUEL_TYPES);
   fillSelect("gearBox", GEAR_BOXES);
+}
+
+function getAllowedCategories(manufacturer) {
+  return BRAND_CATEGORIES[manufacturer] || CATEGORIES;
+}
+
+function syncCategoryOptionsForBrand(manufacturer, preferredCategory) {
+  const allowed = getAllowedCategories(manufacturer);
+  fillSelect("category", allowed);
+  const nextCat = allowed.includes(preferredCategory) ? preferredCategory : allowed[0];
+  document.getElementById("category").value = nextCat;
+  return nextCat;
 }
 
 function fillSelect(id, items, labelFn = (v) => v) {
@@ -162,14 +209,76 @@ function fillSelect(id, items, labelFn = (v) => v) {
 }
 
 // ==========================================================================
-// 2. Linear Regression Inference Engine (Calibrated to 2026)
+// 2. Engineering Filter & Sanity Guard
+// ==========================================================================
+function enforceEngineeringFilters(state, opts = {}) {
+  const { syncDrive = false, notifyOnAdjust = false } = opts;
+  const next = { ...state };
+  const notes = [];
+
+  // 1) Manufacturer -> Category cascading filter
+  const allowedCats = getAllowedCategories(next.Manufacturer);
+  if (!allowedCats.includes(next.Category)) {
+    next.Category = allowedCats[0];
+    notes.push(`تم ضبط الفئة تلقائياً إلى ${next.Category} لتناسب ${next.Manufacturer}`);
+  }
+
+  // 2) Cylinders sane range relative to EngineVolume
+  const vol = Number(next.EngineVolume);
+  let minCyl = 3;
+  let maxCyl = 12;
+  if (vol <= 1.4) {
+    minCyl = 2;
+    maxCyl = 4;
+  } else if (vol <= 2.3) {
+    minCyl = 3;
+    maxCyl = 6;
+  } else if (vol <= 3.8) {
+    minCyl = 4;
+    maxCyl = 8;
+  } else {
+    minCyl = 6;
+    maxCyl = 12;
+  }
+
+  const cyl = Number(next.Cylinders);
+  if (cyl < minCyl || cyl > maxCyl) {
+    next.Cylinders = Math.max(minCyl, Math.min(maxCyl, cyl));
+    notes.push(`تم ضبط السلندرات إلى ${next.Cylinders} لسعة محرك ${vol.toFixed(1)}L`);
+  }
+
+  // 3) Mileage sanity relative to car age (year 2026)
+  const age = Math.max(0, REFERENCE_YEAR - Number(next.ProdYear));
+  const maxSaneMileage = age === 0 ? 35000 : Math.min(499000, age * 55000 + 20000);
+  const minSaneMileage = age >= 5 ? 5000 : 500;
+  const mil = Number(next.Mileage);
+  if (mil > maxSaneMileage) {
+    next.Mileage = Math.round(maxSaneMileage / 500) * 500;
+    notes.push(`تم ضبط العداد إلى ${next.Mileage.toLocaleString("en-US")} km لموديل ${next.ProdYear}`);
+  } else if (mil < minSaneMileage) {
+    next.Mileage = minSaneMileage;
+  }
+
+  // 4) Optional drivetrain alignment when user changes Category explicitly
+  if (syncDrive && CATEGORY_DEFAULT_DRIVE[next.Category]) {
+    next.DriveWheels = CATEGORY_DEFAULT_DRIVE[next.Category];
+  }
+
+  if (notifyOnAdjust && notes.length > 0) {
+    showToast(notes[0]);
+  }
+
+  return next;
+}
+
+// ==========================================================================
+// 3. Linear Regression Inference Engine (Calibrated to 2026)
 // ==========================================================================
 function predictCarPrice(state) {
   if (!MODEL) return null;
 
   const { intercept, coef, mean, scale, sigma } = MODEL;
 
-  // Relative car age in 2026, bounded to the model's trained [0..40] age domain
   const carAge = Math.max(0, Math.min(40, REFERENCE_YEAR - Number(state.ProdYear)));
   const logMileage = Math.log1p(Math.max(1, Number(state.Mileage)));
 
@@ -278,7 +387,7 @@ function formatFeatureLabel(col, state, carAge) {
 }
 
 // ==========================================================================
-// 3. UI Rendering
+// 4. UI Rendering
 // ==========================================================================
 function updatePrediction() {
   const result = predictCarPrice(currentState);
@@ -350,11 +459,13 @@ function renderContributions(items) {
 }
 
 // ==========================================================================
-// 4. Form Synchronization & Events
+// 5. Form Synchronization & Events
 // ==========================================================================
 function applyStateToForm(state) {
   document.getElementById("manufacturer").value = state.Manufacturer;
-  document.getElementById("category").value = state.Category;
+  const activeCat = syncCategoryOptionsForBrand(state.Manufacturer, state.Category);
+  state.Category = activeCat;
+
   document.getElementById("prodYear").value = state.ProdYear;
   document.getElementById("engineVolume").value = state.EngineVolume;
   document.getElementById("cylinders").value = state.Cylinders;
@@ -394,7 +505,6 @@ function syncSliderLabels() {
 }
 
 function bindUIEvents() {
-  // Progressive Disclosure Drawer ("مواصفات إضافية / Other")
   const advBtn = document.getElementById("toggleAdvancedBtn");
   const advPanel = document.getElementById("advancedPanel");
   advBtn.addEventListener("click", () => {
@@ -403,13 +513,30 @@ function bindUIEvents() {
     advPanel.hidden = isExpanded;
   });
 
-  const selectMap = {
-    manufacturer: "Manufacturer",
-    category: "Category",
-    fuelType: "FuelType",
-    gearBox: "GearBox"
-  };
-  Object.entries(selectMap).forEach(([id, key]) => {
+  document.getElementById("manufacturer").addEventListener("change", (e) => {
+    currentState.Manufacturer = e.target.value;
+    currentState = enforceEngineeringFilters(currentState, {
+      syncDrive: false,
+      notifyOnAdjust: true
+    });
+    clearActivePreset();
+    applyStateToForm(currentState);
+    updatePrediction();
+  });
+
+  document.getElementById("category").addEventListener("change", (e) => {
+    currentState.Category = e.target.value;
+    currentState = enforceEngineeringFilters(currentState, {
+      syncDrive: true,
+      notifyOnAdjust: false
+    });
+    clearActivePreset();
+    applyStateToForm(currentState);
+    updatePrediction();
+  });
+
+  ["fuelType", "gearBox"].forEach((id) => {
+    const key = id === "fuelType" ? "FuelType" : "GearBox";
     document.getElementById(id).addEventListener("change", (e) => {
       currentState[key] = e.target.value;
       clearActivePreset();
@@ -429,7 +556,15 @@ function bindUIEvents() {
     document.getElementById(id).addEventListener("input", (e) => {
       currentState[key] = Number(e.target.value);
       clearActivePreset();
-      syncSliderLabels();
+      if (key === "EngineVolume" || key === "ProdYear") {
+        currentState = enforceEngineeringFilters(currentState, {
+          syncDrive: false,
+          notifyOnAdjust: false
+        });
+        applyStateToForm(currentState);
+      } else {
+        syncSliderLabels();
+      }
       updatePrediction();
     });
   });
@@ -467,14 +602,14 @@ function bindUIEvents() {
       if (!PRESETS[key]) return;
       document.querySelectorAll(".preset-chip").forEach((c) => c.classList.remove("active"));
       chip.classList.add("active");
-      currentState = { ...PRESETS[key] };
+      currentState = enforceEngineeringFilters({ ...PRESETS[key] }, { syncDrive: false });
       applyStateToForm(currentState);
       updatePrediction();
     });
   });
 
   document.getElementById("resetBtn").addEventListener("click", () => {
-    currentState = { ...PRESETS.toyota };
+    currentState = enforceEngineeringFilters({ ...PRESETS.toyota }, { syncDrive: false });
     document.querySelectorAll(".preset-chip").forEach((c) => {
       c.classList.toggle("active", c.dataset.preset === "toyota");
     });
@@ -543,7 +678,7 @@ function clearActivePreset() {
 }
 
 // ==========================================================================
-// 5. Comparison Renderer
+// 6. Comparison Renderer
 // ==========================================================================
 function renderComparison() {
   if (!MODEL) return;
@@ -586,7 +721,7 @@ function buildCompareColumnHTML(badge, car, res) {
 }
 
 // ==========================================================================
-// 6. Specular Rim Light Tracking
+// 7. Specular Rim Light Tracking
 // ==========================================================================
 function initSpecularGlassEffect() {
   const surfaces = document.querySelectorAll("[data-specular]");
