@@ -1,6 +1,8 @@
 /* ==========================================================================
-   AutoValuate AI — Client-Side Linear Regression Engine & Liquid Glass UI
+   CarPulse — Client-Side Linear Regression Engine & Liquid Glass UI
    ========================================================================== */
+
+const REFERENCE_YEAR = 2026;
 
 const MANUFACTURERS = [
   "ACURA", "ALFA ROMEO", "ASTON MARTIN", "AUDI", "BMW", "BUICK", "CADILLAC",
@@ -31,7 +33,7 @@ const PRESETS = {
   toyota: {
     Manufacturer: "TOYOTA",
     Category: "Sedan",
-    ProdYear: 2016,
+    ProdYear: 2022,
     Doors: 4,
     EngineVolume: 2.5,
     Cylinders: 4,
@@ -39,33 +41,16 @@ const PRESETS = {
     GearBox: "Tiptronic",
     DriveWheels: "Front",
     Turbo: false,
-    Mileage: 85000,
+    Mileage: 65000,
     Levy: 779,
     Airbags: 8,
-    Leather: true,
-    Wheel: false
-  },
-  bmw: {
-    Manufacturer: "BMW",
-    Category: "Jeep",
-    ProdYear: 2015,
-    Doors: 4,
-    EngineVolume: 4.8,
-    Cylinders: 8,
-    FuelType: "Petrol",
-    GearBox: "Tiptronic",
-    DriveWheels: "4x4",
-    Turbo: true,
-    Mileage: 72000,
-    Levy: 1250,
-    Airbags: 12,
     Leather: true,
     Wheel: false
   },
   hyundai: {
     Manufacturer: "HYUNDAI",
     Category: "Sedan",
-    ProdYear: 2017,
+    ProdYear: 2021,
     Doors: 4,
     EngineVolume: 2.0,
     Cylinders: 4,
@@ -73,25 +58,25 @@ const PRESETS = {
     GearBox: "Automatic",
     DriveWheels: "Front",
     Turbo: false,
-    Mileage: 95000,
+    Mileage: 82000,
     Levy: 640,
     Airbags: 6,
     Leather: true,
     Wheel: false
   },
-  tesla: {
-    Manufacturer: "TESLA",
-    Category: "Sedan",
-    ProdYear: 2019,
+  bmw: {
+    Manufacturer: "BMW",
+    Category: "Jeep",
+    ProdYear: 2023,
     Doors: 4,
-    EngineVolume: 2.0,
-    Cylinders: 4,
-    FuelType: "Plug-in Hybrid",
-    GearBox: "Automatic",
+    EngineVolume: 4.8,
+    Cylinders: 8,
+    FuelType: "Petrol",
+    GearBox: "Tiptronic",
     DriveWheels: "4x4",
-    Turbo: false,
-    Mileage: 28000,
-    Levy: 0,
+    Turbo: true,
+    Mileage: 48000,
+    Levy: 1250,
     Airbags: 12,
     Leather: true,
     Wheel: false
@@ -99,7 +84,7 @@ const PRESETS = {
   mercedes: {
     Manufacturer: "MERCEDES-BENZ",
     Category: "Sedan",
-    ProdYear: 2014,
+    ProdYear: 2020,
     Doors: 4,
     EngineVolume: 2.7,
     Cylinders: 6,
@@ -107,9 +92,26 @@ const PRESETS = {
     GearBox: "Tiptronic",
     DriveWheels: "Rear",
     Turbo: true,
-    Mileage: 135000,
+    Mileage: 110000,
     Levy: 890,
     Airbags: 10,
+    Leather: true,
+    Wheel: false
+  },
+  tesla: {
+    Manufacturer: "TESLA",
+    Category: "Sedan",
+    ProdYear: 2024,
+    Doors: 4,
+    EngineVolume: 2.0,
+    Cylinders: 4,
+    FuelType: "Plug-in Hybrid",
+    GearBox: "Automatic",
+    DriveWheels: "4x4",
+    Turbo: false,
+    Mileage: 24000,
+    Levy: 0,
+    Airbags: 12,
     Leather: true,
     Wheel: false
   }
@@ -124,7 +126,7 @@ let displayedPrice = 0;
 let animFrameId = null;
 
 // ==========================================================================
-// 1. Initialization & Data Loading
+// 1. Initialization
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", async () => {
   populateDropdowns();
@@ -139,7 +141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderComparison();
   } catch (err) {
     console.error("Failed to load model.json:", err);
-    showToast("تعذر تحميل ملف معاملات الموديل model.json");
+    showToast("تعذر تحميل ملف معاملات النموذج");
   }
 });
 
@@ -160,15 +162,15 @@ function fillSelect(id, items, labelFn = (v) => v) {
 }
 
 // ==========================================================================
-// 2. Exact Python-Matched Linear Regression Inference Engine
+// 2. Linear Regression Inference Engine (Calibrated to 2026)
 // ==========================================================================
 function predictCarPrice(state) {
   if (!MODEL) return null;
 
   const { intercept, coef, mean, scale, sigma } = MODEL;
 
-  // Derived features matching car_price_linear_regression.py
-  const carAge = Math.max(0, Math.min(40, 2020 - Number(state.ProdYear)));
+  // Relative car age in 2026, bounded to the model's trained [0..40] age domain
+  const carAge = Math.max(0, Math.min(40, REFERENCE_YEAR - Number(state.ProdYear)));
   const logMileage = Math.log1p(Math.max(1, Number(state.Mileage)));
 
   const rawNumeric = {
@@ -184,7 +186,6 @@ function predictCarPrice(state) {
   let logPred = intercept;
   const contributions = [];
 
-  // 1. Standardized Numeric Features
   for (const col of MODEL.num_cols) {
     const z = (rawNumeric[col] - mean[col]) / scale[col];
     const delta = z * (coef[col] || 0);
@@ -196,7 +197,6 @@ function predictCarPrice(state) {
     });
   }
 
-  // 2. Binary Features
   const binaryMap = {
     "Leather interior": state.Leather ? 1 : 0,
     Wheel: state.Wheel ? 1 : 0,
@@ -215,7 +215,6 @@ function predictCarPrice(state) {
     }
   }
 
-  // 3. One-Hot Encoded Categorical Features (drop_first=True)
   const oneHotSpecs = [
     { prefix: "Manufacturer_", val: state.Manufacturer, label: `الماركة: ${state.Manufacturer}` },
     { prefix: "Category_", val: state.Category, label: `الفئة: ${state.Category}` },
@@ -235,12 +234,10 @@ function predictCarPrice(state) {
     });
   }
 
-  // Inverse log1p transformation -> Real USD price
   const price = Math.max(2000, Math.expm1(logPred));
   const priceLow = Math.max(1500, Math.expm1(logPred - sigma));
   const priceHigh = Math.expm1(logPred + sigma);
 
-  // Sort contributions by absolute magnitude
   contributions.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
 
   return {
@@ -256,7 +253,7 @@ function predictCarPrice(state) {
 function formatFeatureLabel(col, state, carAge) {
   switch (col) {
     case "Car age":
-      return `عمر السيارة (${carAge} سنة)`;
+      return carAge === 0 ? "سنة الصنع (جديد 2026)" : `عمر السيارة (${carAge} سنة)`;
     case "Engine volume":
       return `سعة المحرك (${Number(state.EngineVolume).toFixed(1)}L)`;
     case "Mileage":
@@ -270,7 +267,7 @@ function formatFeatureLabel(col, state, carAge) {
     case "Levy":
       return `الرسوم الجمركية ($${state.Levy})`;
     case "Leather interior":
-      return state.Leather ? "فرش جلد فاخر" : "فرش قماش";
+      return state.Leather ? "فرش جلد" : "فرش قماش";
     case "Doors":
       return `عدد الأبواب (${state.Doors})`;
     case "Cylinders":
@@ -281,7 +278,7 @@ function formatFeatureLabel(col, state, carAge) {
 }
 
 // ==========================================================================
-// 3. UI Rendering & Smooth Number Interpolation
+// 3. UI Rendering
 // ==========================================================================
 function updatePrediction() {
   const result = predictCarPrice(currentState);
@@ -293,7 +290,6 @@ function updatePrediction() {
   document.getElementById("priceLow").textContent = `$${Math.round(result.priceLow).toLocaleString("en-US")}`;
   document.getElementById("priceHigh").textContent = `$${Math.round(result.priceHigh).toLocaleString("en-US")}`;
 
-  // Update summary pills
   const pillsContainer = document.getElementById("carSummaryPills");
   const tags = [
     `${currentState.Manufacturer} • ${currentState.ProdYear}`,
@@ -305,14 +301,13 @@ function updatePrediction() {
   ];
   pillsContainer.innerHTML = tags.map((t) => `<span class="spec-pill">${t}</span>`).join("");
 
-  // Render top 6 feature contributions
-  renderContributions(result.contributions.slice(0, 6));
+  renderContributions(result.contributions.slice(0, 5));
 }
 
 function animatePriceCounter(target) {
   if (animFrameId) cancelAnimationFrame(animFrameId);
-  const start = displayedPrice || target * 0.85;
-  const duration = 360;
+  const start = displayedPrice || target * 0.88;
+  const duration = 320;
   const startTime = performance.now();
   const el = document.getElementById("predictedPrice");
 
@@ -343,7 +338,7 @@ function renderContributions(items) {
         <div class="contrib-item">
           <div class="contrib-top">
             <span class="contrib-name">${item.label}</span>
-            <span class="contrib-val ${isPos ? "pos" : "neg"}">${sign}${pctImpact}% (${sign}${item.delta.toFixed(2)})</span>
+            <span class="contrib-val ${isPos ? "pos" : "neg"}">${sign}${pctImpact}%</span>
           </div>
           <div class="contrib-track">
             <div class="contrib-bar ${isPos ? "pos" : "neg"}" style="width: ${pct}%"></div>
@@ -372,7 +367,6 @@ function applyStateToForm(state) {
   document.getElementById("leather").checked = Boolean(state.Leather);
   document.getElementById("wheel").checked = Boolean(state.Wheel);
 
-  // Segmented controls
   document.querySelectorAll(".segmented-control").forEach((group) => {
     const key = group.dataset.name;
     group.querySelectorAll(".seg-btn").forEach((btn) => {
@@ -385,23 +379,30 @@ function applyStateToForm(state) {
 
 function syncSliderLabels() {
   const year = Number(currentState.ProdYear);
-  const age = 2020 - year;
-  document.getElementById("prodYearVal").innerHTML = `${year} <small>(عمر: ${age} سنة)</small>`;
+  const age = REFERENCE_YEAR - year;
+  const ageLabel = age === 0 ? "موديل السنة" : `عمر: ${age} سنة`;
+  document.getElementById("prodYearVal").innerHTML = `${year} <small>(${ageLabel})</small>`;
   document.getElementById("engineVolumeVal").textContent = `${Number(currentState.EngineVolume).toFixed(1)} L`;
   document.getElementById("cylindersVal").textContent = `${currentState.Cylinders} سلندر`;
   document.getElementById("mileageVal").textContent = `${Number(currentState.Mileage).toLocaleString("en-US")} km`;
   document.getElementById("levyVal").textContent = `$${Number(currentState.Levy).toLocaleString("en-US")}`;
   document.getElementById("airbagsVal").textContent = `${currentState.Airbags} وسائد`;
 
-  document.getElementById("turboLabel").textContent = currentState.Turbo
-    ? "مفعل (Turbocharged)"
-    : "بدون تيربو (Naturally Aspirated)";
-  document.getElementById("leatherLabel").textContent = currentState.Leather ? "نعم (جلد)" : "لا (قماش)";
-  document.getElementById("wheelLabel").textContent = currentState.Wheel ? "يمين (RHD)" : "يسار (قياسي)";
+  document.getElementById("turboLabel").textContent = currentState.Turbo ? "مفعل (Turbo)" : "بدون تيربو";
+  document.getElementById("leatherLabel").textContent = currentState.Leather ? "نعم" : "لا";
+  document.getElementById("wheelLabel").textContent = currentState.Wheel ? "يمين" : "يسار";
 }
 
 function bindUIEvents() {
-  // Select dropdowns
+  // Progressive Disclosure Drawer ("مواصفات إضافية / Other")
+  const advBtn = document.getElementById("toggleAdvancedBtn");
+  const advPanel = document.getElementById("advancedPanel");
+  advBtn.addEventListener("click", () => {
+    const isExpanded = advBtn.getAttribute("aria-expanded") === "true";
+    advBtn.setAttribute("aria-expanded", String(!isExpanded));
+    advPanel.hidden = isExpanded;
+  });
+
   const selectMap = {
     manufacturer: "Manufacturer",
     category: "Category",
@@ -416,7 +417,6 @@ function bindUIEvents() {
     });
   });
 
-  // Sliders
   const sliderMap = {
     prodYear: "ProdYear",
     engineVolume: "EngineVolume",
@@ -434,7 +434,6 @@ function bindUIEvents() {
     });
   });
 
-  // Checkboxes
   const checkMap = {
     turbo: "Turbo",
     leather: "Leather",
@@ -449,7 +448,6 @@ function bindUIEvents() {
     });
   });
 
-  // Segmented Controls
   document.querySelectorAll(".segmented-control").forEach((group) => {
     const key = group.dataset.name;
     group.querySelectorAll(".seg-btn").forEach((btn) => {
@@ -463,7 +461,6 @@ function bindUIEvents() {
     });
   });
 
-  // Presets
   document.querySelectorAll(".preset-chip").forEach((chip) => {
     chip.addEventListener("click", () => {
       const key = chip.dataset.preset;
@@ -473,11 +470,9 @@ function bindUIEvents() {
       currentState = { ...PRESETS[key] };
       applyStateToForm(currentState);
       updatePrediction();
-      showToast(`تم تحميل قالب ${chip.textContent.trim()}`);
     });
   });
 
-  // Reset Button
   document.getElementById("resetBtn").addEventListener("click", () => {
     currentState = { ...PRESETS.toyota };
     document.querySelectorAll(".preset-chip").forEach((c) => {
@@ -485,34 +480,31 @@ function bindUIEvents() {
     });
     applyStateToForm(currentState);
     updatePrediction();
-    showToast("تمت إعادة ضبط المواصفات للقيم الافتراضية");
+    showToast("تمت إعادة ضبط المواصفات");
   });
 
-  // Copy Price
   document.getElementById("copyPriceBtn").addEventListener("click", () => {
     const priceText = document.getElementById("predictedPrice").textContent;
-    const summary = `${currentState.Manufacturer} (${currentState.ProdYear}) - السعر التقديري: $${priceText}`;
+    const summary = `${currentState.Manufacturer} (${currentState.ProdYear}) - التقييم: $${priceText}`;
     navigator.clipboard?.writeText(summary);
-    showToast("تم نسخ ملخص التسعير إلى الحافظة");
+    showToast("تم نسخ التقييم");
   });
 
-  // Navigation Tabs
   document.querySelectorAll(".nav-tab").forEach((tab) => {
     tab.addEventListener("click", () => {
       switchTab(tab.dataset.tab);
     });
   });
 
-  // Send to Compare
   document.getElementById("saveCompareBtn").addEventListener("click", () => {
     if (nextCompareSlot === "A") {
       compareSlotA = { ...currentState };
       nextCompareSlot = "B";
-      showToast("تم حفظ السيارة في الخانة A");
+      showToast("تم حفظ السيارة في A");
     } else {
       compareSlotB = { ...currentState };
       nextCompareSlot = "A";
-      showToast("تم حفظ السيارة في الخانة B");
+      showToast("تم حفظ السيارة في B");
     }
     renderComparison();
     switchTab("compare");
@@ -521,20 +513,17 @@ function bindUIEvents() {
   document.getElementById("loadCurrentToA").addEventListener("click", () => {
     compareSlotA = { ...currentState };
     renderComparison();
-    showToast("تم تحديث السيارة A بالمواصفات الحالية");
+    showToast("تم تحديث السيارة A");
   });
 
   document.getElementById("loadCurrentToB").addEventListener("click", () => {
     compareSlotB = { ...currentState };
     renderComparison();
-    showToast("تم تحديث السيارة B بالمواصفات الحالية");
+    showToast("تم تحديث السيارة B");
   });
 
-  // Theme Toggle
   document.getElementById("themeToggle").addEventListener("click", () => {
     document.body.classList.toggle("light-glass");
-    const isLight = document.body.classList.contains("light-glass");
-    showToast(isLight ? "تم تفعيل وضع الزجاج النهاري الفاتح" : "تم تفعيل وضع الزجاج الليلي الداكن");
   });
 }
 
@@ -554,7 +543,7 @@ function clearActivePreset() {
 }
 
 // ==========================================================================
-// 5. Comparison View Renderer
+// 5. Comparison Renderer
 // ==========================================================================
 function renderComparison() {
   if (!MODEL) return;
@@ -567,14 +556,14 @@ function renderComparison() {
   const diff = resB.price - resA.price;
   const absDiff = Math.abs(Math.round(diff)).toLocaleString("en-US");
   const pct = ((Math.abs(diff) / Math.min(resA.price, resB.price)) * 100).toFixed(1);
-  const higher = diff >= 0 ? "السيارة B أغلى بـ" : "السيارة A أغلى بـ";
+  const higher = diff >= 0 ? "السيارة B أعلى سعراً بـ" : "السيارة A أعلى سعراً بـ";
 
   document.getElementById("compareSummaryCard").innerHTML = `
     <div class="vs-badge">VS</div>
     <span class="tag-pill">${higher}</span>
-    <div class="diff-amount" style="color: var(--accent-cyan)">$${absDiff}</div>
-    <p style="color: var(--text-secondary); font-size: 0.9rem;">
-      فارق سعري بنسبة <strong>${pct}%</strong> بناءً على معاملات الموديل اللوغاريتمية.
+    <div class="diff-amount">$${absDiff}</div>
+    <p style="color: var(--text-secondary); font-size: 0.88rem;">
+      فارق بنسبة <strong>${pct}%</strong> وفق معاملات التقييم.
     </p>
   `;
 }
@@ -583,7 +572,7 @@ function buildCompareColumnHTML(badge, car, res) {
   return `
     <span class="tag-pill">${badge}</span>
     <h3 style="margin-top: 12px;">${car.Manufacturer} (${car.ProdYear})</h3>
-    <p style="color: var(--text-secondary); font-size: 0.85rem;">${car.Category} • ${car.FuelType}</p>
+    <p style="color: var(--text-secondary); font-size: 0.84rem;">${car.Category} • ${car.FuelType}</p>
     <div class="compare-price">$${Math.round(res.price).toLocaleString("en-US")}</div>
     <ul class="compare-specs-list">
       <li><span>سعة المحرك</span><strong>${Number(car.EngineVolume).toFixed(1)}L ${car.Turbo ? "(Turbo)" : ""}</strong></li>
@@ -597,7 +586,7 @@ function buildCompareColumnHTML(badge, car, res) {
 }
 
 // ==========================================================================
-// 6. Specular Mouse Tracking for Liquid Glass Refraction
+// 6. Specular Rim Light Tracking
 // ==========================================================================
 function initSpecularGlassEffect() {
   const surfaces = document.querySelectorAll("[data-specular]");
@@ -618,5 +607,5 @@ function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
 }

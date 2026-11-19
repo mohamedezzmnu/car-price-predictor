@@ -3,40 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AutoValuate AI — تسعير السيارات الذكي | Liquid Glass</title>
-  <meta name="description" content="منصة ذكاء اصطناعي لتوقع أسعار السيارات بدقة عالية باستخدام نموذج الانحدار الخطي اللوغاريتمي (Linear Regression) بتصميم Liquid Glass." />
+  <title>CarPulse — تسعير السيارات الذكي</title>
+  <meta name="description" content="منصة هندسية لتقدير القيمة السوقية للسيارات باستخدام التحليل الإحصائي والانحدار اللوغاريتمي." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Hidden SVG Refraction Filter for Authentic Liquid Glass -->
-  <svg class="svg-defs" aria-hidden="true">
-    <defs>
-      <filter id="liquid-refraction" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.015" numOctaves="2" seed="7" result="noise" />
-        <feGaussianBlur in="noise" stdDeviation="3" result="softNoise" />
-        <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="6" xChannelSelector="R" yChannelSelector="G" />
-      </filter>
-    </defs>
-  </svg>
-
-  <!-- Ambient Mesh Gradient Orbs -->
+  <!-- Subtle Architectural Ambient Backdrop (No Neon AI Blobs) -->
   <div class="ambient-canvas" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="orb orb-4"></div>
-    <div class="noise-overlay"></div>
+    <div class="ambient-light light-top"></div>
+    <div class="ambient-light light-bottom"></div>
+    <div class="subtle-grid"></div>
   </div>
 
-  <!-- Top Floating Liquid Glass Navigation -->
+  <!-- Floating Liquid Glass Header -->
   <header class="glass-nav-wrapper">
     <nav class="glass-nav liquid-surface" data-specular>
       <div class="brand">
-        <div class="brand-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+        <div class="brand-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
             <circle cx="7" cy="17" r="2"/>
             <path d="M9 17h6"/>
@@ -44,33 +31,23 @@
           </svg>
         </div>
         <div class="brand-text">
-          <span class="brand-title">AutoValuate <span class="accent-pill">AI</span></span>
-          <span class="brand-sub">Log-Linear Regression Engine</span>
+          <span class="brand-title">CarPulse</span>
+          <span class="brand-sub">Vehicle Valuation Engine</span>
         </div>
       </div>
 
       <div class="nav-tabs" role="tablist">
-        <button class="nav-tab active" data-tab="predictor" role="tab" aria-selected="true">
-          <span>حاسبة التسعير</span>
-        </button>
-        <button class="nav-tab" data-tab="compare" role="tab" aria-selected="false">
-          <span>مقارنة سيارتين</span>
-        </button>
-        <button class="nav-tab" data-tab="diagnostics" role="tab" aria-selected="false">
-          <span>تحليل الموديل</span>
-        </button>
+        <button class="nav-tab active" data-tab="predictor" role="tab" aria-selected="true">التسعير</button>
+        <button class="nav-tab" data-tab="compare" role="tab" aria-selected="false">المقارنة</button>
+        <button class="nav-tab" data-tab="diagnostics" role="tab" aria-selected="false">بيانات النموذج</button>
       </div>
 
       <div class="nav-actions">
-        <div class="model-status" title="الموديل جاهز ويعمل محلياً في المتصفح">
-          <span class="status-dot"></span>
-          <span class="status-text">N = 13,174</span>
-        </div>
-        <button id="themeToggle" class="icon-btn liquid-pill" title="تبديل إضاءة الزجاج (داكن / فاتح)" aria-label="تبديل المظهر">
-          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="themeToggle" class="icon-btn liquid-pill" title="تبديل الإضاءة" aria-label="تبديل المظهر">
+          <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
           </svg>
-          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
           </svg>
         </button>
@@ -79,60 +56,38 @@
   </header>
 
   <main class="container">
-    <!-- Hero Header -->
-    <section class="hero-section">
-      <div class="hero-badge liquid-pill">
-        <span class="sparkle">✦</span>
-        <span>نموذج تنبؤ مدرب على 13,174 سيارة حقيقية • دقة R² = 0.525</span>
+    <!-- Clean, Focused Header -->
+    <section class="page-header">
+      <div class="header-copy">
+        <h1>تقدير القيمة السوقية للسيارة</h1>
+        <p>اختر المواصفات الأساسية للسيارة لحساب السعر التقديري الفوري، أو افتح الخيارات الإضافية لضبط التفاصيل الدقيقة.</p>
       </div>
-      <h1 class="hero-title">
-        تقييم فوري وذكي لأسعار السيارات
-        <span class="gradient-text">بتجربة Liquid Glass</span>
-      </h1>
-      <p class="hero-desc">
-        أدخل مواصفات السيارة بالكامل ليقوم محرك الانحدار الخطي اللوغاريتمي (Log-Linear Regression) بحساب السعر التقديري، نطاق الثقة الإحصائي، وتأثير كل ميزة على السعر لحظياً.
-      </p>
 
-      <!-- Quick Presets Strip -->
+      <!-- Quick Presets -->
       <div class="presets-bar">
-        <span class="presets-label">قوالب جاهزة للتجربة السريعة:</span>
+        <span class="presets-label">أمثلة سريعة:</span>
         <div class="presets-list" id="presetsContainer">
-          <button type="button" class="preset-chip liquid-pill active" data-preset="toyota">
-            <span class="chip-dot" style="background:#38bdf8"></span>
-            Toyota Camry 2016
-          </button>
-          <button type="button" class="preset-chip liquid-pill" data-preset="bmw">
-            <span class="chip-dot" style="background:#818cf8"></span>
-            BMW X5 4.8 Turbo
-          </button>
-          <button type="button" class="preset-chip liquid-pill" data-preset="hyundai">
-            <span class="chip-dot" style="background:#34d399"></span>
-            Hyundai Elantra 2017
-          </button>
-          <button type="button" class="preset-chip liquid-pill" data-preset="tesla">
-            <span class="chip-dot" style="background:#f472b6"></span>
-            Tesla Model S 2019
-          </button>
-          <button type="button" class="preset-chip liquid-pill" data-preset="mercedes">
-            <span class="chip-dot" style="background:#fbbf24"></span>
-            Mercedes E-Class Diesel
-          </button>
+          <button type="button" class="preset-chip liquid-pill active" data-preset="toyota">Toyota Camry 2022</button>
+          <button type="button" class="preset-chip liquid-pill" data-preset="hyundai">Hyundai Elantra 2021</button>
+          <button type="button" class="preset-chip liquid-pill" data-preset="bmw">BMW X5 Turbo 2023</button>
+          <button type="button" class="preset-chip liquid-pill" data-preset="mercedes">Mercedes E-Class 2020</button>
+          <button type="button" class="preset-chip liquid-pill" data-preset="tesla">Tesla Model S 2024</button>
         </div>
       </div>
     </section>
 
-    <!-- TAB 1: PREDICTOR WORKSPACE -->
+    <!-- TAB 1: PREDICTOR -->
     <section id="tab-predictor" class="tab-panel active">
       <div class="workspace-grid">
-        <!-- Left/Main Form Card -->
+        <!-- Main Form -->
         <div class="glass-card liquid-surface form-card" data-specular>
           <div class="card-header">
             <div>
-              <h2>مواصفات السيارة</h2>
-              <p>عدّل أي قيمة وسيتم تحديث السعر والرسوم البيانية تلقائياً</p>
+              <h2>المواصفات الأساسية</h2>
+              <p>العوامل الأكثر تأثيراً في تحديد سعر السيارة</p>
             </div>
             <button type="button" id="resetBtn" class="ghost-btn liquid-pill">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
               </svg>
               <span>إعادة ضبط</span>
@@ -140,159 +95,153 @@
           </div>
 
           <form id="carForm" class="car-form" novalidate>
-            <!-- Group 1: Identity & Body -->
-            <div class="form-section">
-              <div class="section-label">
-                <span class="step-num">01</span>
-                <span>الهوية والهيكل الخارجي</span>
-              </div>
-              <div class="fields-grid">
-                <div class="field-group">
-                  <label for="manufacturer">الشركة المصنعة (Manufacturer)</label>
-                  <div class="select-wrapper">
-                    <select id="manufacturer" name="Manufacturer"></select>
-                  </div>
-                </div>
-
-                <div class="field-group">
-                  <label for="category">فئة السيارة (Category)</label>
-                  <div class="select-wrapper">
-                    <select id="category" name="Category"></select>
-                  </div>
-                </div>
-
-                <div class="field-group">
-                  <div class="label-row">
-                    <label for="prodYear">سنة الصنع (Prod. Year)</label>
-                    <span class="value-badge" id="prodYearVal">2016 <small>(عمر: 4 سنوات)</small></span>
-                  </div>
-                  <input type="range" id="prodYear" name="ProdYear" min="1980" max="2020" value="2016" class="liquid-slider" />
-                  <div class="range-ticks"><span>1980</span><span>2000</span><span>2010</span><span>2020</span></div>
-                </div>
-
-                <div class="field-group">
-                  <label>عدد الأبواب (Doors)</label>
-                  <div class="segmented-control" data-name="Doors">
-                    <button type="button" class="seg-btn" data-value="2">2 باب</button>
-                    <button type="button" class="seg-btn active" data-value="4">4 أبواب</button>
-                    <button type="button" class="seg-btn" data-value="5">&gt; 5 أبواب</button>
-                  </div>
+            <!-- Essential Fields Only (6 Core Inputs) -->
+            <div class="fields-grid">
+              <div class="field-group">
+                <label for="manufacturer">الشركة المصنعة</label>
+                <div class="select-wrapper">
+                  <select id="manufacturer" name="Manufacturer"></select>
                 </div>
               </div>
-            </div>
 
-            <!-- Group 2: Engine & Powertrain -->
-            <div class="form-section">
-              <div class="section-label">
-                <span class="step-num">02</span>
-                <span>المحرك ومنظومة الحركة</span>
+              <div class="field-group">
+                <label for="category">فئة الهيكل</label>
+                <div class="select-wrapper">
+                  <select id="category" name="Category"></select>
+                </div>
               </div>
-              <div class="fields-grid">
-                <div class="field-group">
-                  <div class="label-row">
-                    <label for="engineVolume">سعة المحرك (Engine Volume)</label>
-                    <span class="value-badge" id="engineVolumeVal">2.5 L</span>
-                  </div>
-                  <input type="range" id="engineVolume" name="EngineVolume" min="0.8" max="6.5" step="0.1" value="2.5" class="liquid-slider" />
-                  <div class="range-ticks"><span>0.8L</span><span>2.0L</span><span>4.0L</span><span>6.5L</span></div>
-                </div>
 
-                <div class="field-group">
-                  <div class="label-row">
-                    <label for="cylinders">عدد الأسطوانات (Cylinders)</label>
-                    <span class="value-badge" id="cylindersVal">4 سلندر</span>
-                  </div>
-                  <input type="range" id="cylinders" name="Cylinders" min="1" max="12" step="1" value="4" class="liquid-slider" />
-                  <div class="range-ticks"><span>1</span><span>4</span><span>6</span><span>8</span><span>12</span></div>
+              <div class="field-group">
+                <div class="label-row">
+                  <label for="prodYear">سنة الصنع</label>
+                  <span class="value-badge" id="prodYearVal">2022 <small>(عمر: 4 سنوات)</small></span>
                 </div>
+                <input type="range" id="prodYear" name="ProdYear" min="1986" max="2026" value="2022" class="liquid-slider" />
+                <div class="range-ticks"><span>1986</span><span>2000</span><span>2015</span><span>2026</span></div>
+              </div>
 
-                <div class="field-group">
-                  <label for="fuelType">نوع الوقود (Fuel Type)</label>
-                  <div class="select-wrapper">
-                    <select id="fuelType" name="FuelType"></select>
-                  </div>
+              <div class="field-group">
+                <div class="label-row">
+                  <label for="mileage">المسافة المقطوعة</label>
+                  <span class="value-badge" id="mileageVal">65,000 km</span>
                 </div>
+                <input type="range" id="mileage" name="Mileage" min="500" max="499000" step="500" value="65000" class="liquid-slider" />
+                <div class="range-ticks"><span>500 km</span><span>150k</span><span>300k</span><span>500k</span></div>
+              </div>
 
-                <div class="field-group">
-                  <label for="gearBox">ناقل الحركة (Gear Box)</label>
-                  <div class="select-wrapper">
-                    <select id="gearBox" name="GearBox"></select>
-                  </div>
+              <div class="field-group">
+                <div class="label-row">
+                  <label for="engineVolume">سعة المحرك</label>
+                  <span class="value-badge" id="engineVolumeVal">2.5 L</span>
                 </div>
+                <input type="range" id="engineVolume" name="EngineVolume" min="0.8" max="6.5" step="0.1" value="2.5" class="liquid-slider" />
+                <div class="range-ticks"><span>0.8L</span><span>2.0L</span><span>4.0L</span><span>6.5L</span></div>
+              </div>
 
-                <div class="field-group">
-                  <label>نظام الدفع (Drive Wheels)</label>
-                  <div class="segmented-control" data-name="DriveWheels">
-                    <button type="button" class="seg-btn active" data-value="Front">أمامي (Front)</button>
-                    <button type="button" class="seg-btn" data-value="Rear">خلفي (Rear)</button>
-                    <button type="button" class="seg-btn" data-value="4x4">رباعي (4x4)</button>
-                  </div>
+              <div class="field-group">
+                <label for="fuelType">نوع الوقود</label>
+                <div class="select-wrapper">
+                  <select id="fuelType" name="FuelType"></select>
                 </div>
+              </div>
 
-                <div class="field-group">
-                  <label>شاحن توربيني (Turbo)</label>
-                  <label class="glass-switch">
-                    <input type="checkbox" id="turbo" name="Turbo" />
-                    <span class="switch-track">
-                      <span class="switch-thumb"></span>
-                    </span>
-                    <span class="switch-label" id="turboLabel">بدون تيربو (Naturally Aspirated)</span>
-                  </label>
+              <div class="field-group">
+                <label for="gearBox">ناقل الحركة</label>
+                <div class="select-wrapper">
+                  <select id="gearBox" name="GearBox"></select>
                 </div>
+              </div>
+
+              <div class="field-group">
+                <label>شاحن توربيني (Turbo)</label>
+                <label class="glass-switch">
+                  <input type="checkbox" id="turbo" name="Turbo" />
+                  <span class="switch-track"><span class="switch-thumb"></span></span>
+                  <span class="switch-label" id="turboLabel">بدون تيربو</span>
+                </label>
               </div>
             </div>
 
-            <!-- Group 3: Usage, Safety & Taxes -->
-            <div class="form-section">
-              <div class="section-label">
-                <span class="step-num">03</span>
-                <span>الاستهلاك والتجهيزات الداخلية</span>
-              </div>
-              <div class="fields-grid">
-                <div class="field-group">
-                  <div class="label-row">
-                    <label for="mileage">المسافة المقطوعة (Mileage)</label>
-                    <span class="value-badge" id="mileageVal">85,000 km</span>
-                  </div>
-                  <input type="range" id="mileage" name="Mileage" min="500" max="499000" step="500" value="85000" class="liquid-slider" />
-                  <div class="range-ticks"><span>500 km</span><span>150k</span><span>300k</span><span>500k</span></div>
+            <!-- Progressive Disclosure: "Other / مواصفات إضافية" -->
+            <div class="advanced-drawer">
+              <button type="button" id="toggleAdvancedBtn" class="advanced-trigger liquid-pill" aria-expanded="false" aria-controls="advancedPanel">
+                <div class="trigger-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
+                    <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
+                    <line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
+                  </svg>
+                  <span>مواصفات إضافية (Other)</span>
+                  <span class="muted-hint">الدفع، السلندرات، الوسائد، الجمارك، الفرش</span>
                 </div>
+                <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
 
-                <div class="field-group">
-                  <div class="label-row">
-                    <label for="levy">الرسوم الجمركية / الضريبة (Levy)</label>
-                    <span class="value-badge" id="levyVal">$779</span>
-                  </div>
-                  <input type="range" id="levy" name="Levy" min="0" max="3500" step="10" value="779" class="liquid-slider" />
-                  <div class="range-ticks"><span>$0</span><span>$779 (الوسيط)</span><span>$2,000</span><span>$3,500</span></div>
-                </div>
-
-                <div class="field-group">
-                  <div class="label-row">
-                    <label for="airbags">الوسائد الهوائية (Airbags)</label>
-                    <span class="value-badge" id="airbagsVal">8 وسائد</span>
-                  </div>
-                  <input type="range" id="airbags" name="Airbags" min="0" max="16" step="1" value="8" class="liquid-slider" />
-                  <div class="range-ticks"><span>0</span><span>4</span><span>8</span><span>12</span><span>16</span></div>
-                </div>
-
-                <div class="field-group toggles-row">
-                  <div class="mini-toggle">
-                    <label>فرش جلد (Leather)</label>
-                    <label class="glass-switch compact">
-                      <input type="checkbox" id="leather" name="Leather" checked />
-                      <span class="switch-track"><span class="switch-thumb"></span></span>
-                      <span class="switch-label" id="leatherLabel">نعم</span>
-                    </label>
+              <div id="advancedPanel" class="advanced-panel" hidden>
+                <div class="fields-grid">
+                  <div class="field-group">
+                    <label>نظام الدفع</label>
+                    <div class="segmented-control" data-name="DriveWheels">
+                      <button type="button" class="seg-btn active" data-value="Front">أمامي</button>
+                      <button type="button" class="seg-btn" data-value="Rear">خلفي</button>
+                      <button type="button" class="seg-btn" data-value="4x4">رباعي 4x4</button>
+                    </div>
                   </div>
 
-                  <div class="mini-toggle">
-                    <label>مقود يمين (Right-Hand)</label>
-                    <label class="glass-switch compact">
-                      <input type="checkbox" id="wheel" name="Wheel" />
-                      <span class="switch-track"><span class="switch-thumb"></span></span>
-                      <span class="switch-label" id="wheelLabel">يسار (قياسي)</span>
-                    </label>
+                  <div class="field-group">
+                    <label>عدد الأبواب</label>
+                    <div class="segmented-control" data-name="Doors">
+                      <button type="button" class="seg-btn" data-value="2">2 باب</button>
+                      <button type="button" class="seg-btn active" data-value="4">4 أبواب</button>
+                      <button type="button" class="seg-btn" data-value="5">&gt; 5</button>
+                    </div>
+                  </div>
+
+                  <div class="field-group">
+                    <div class="label-row">
+                      <label for="cylinders">عدد الأسطوانات (Cylinders)</label>
+                      <span class="value-badge" id="cylindersVal">4 سلندر</span>
+                    </div>
+                    <input type="range" id="cylinders" name="Cylinders" min="1" max="12" step="1" value="4" class="liquid-slider" />
+                  </div>
+
+                  <div class="field-group">
+                    <div class="label-row">
+                      <label for="airbags">الوسائد الهوائية (Airbags)</label>
+                      <span class="value-badge" id="airbagsVal">8 وسائد</span>
+                    </div>
+                    <input type="range" id="airbags" name="Airbags" min="0" max="16" step="1" value="8" class="liquid-slider" />
+                  </div>
+
+                  <div class="field-group">
+                    <div class="label-row">
+                      <label for="levy">الرسوم الجمركية (Levy)</label>
+                      <span class="value-badge" id="levyVal">$779</span>
+                    </div>
+                    <input type="range" id="levy" name="Levy" min="0" max="3500" step="10" value="779" class="liquid-slider" />
+                  </div>
+
+                  <div class="field-group toggles-row">
+                    <div class="mini-toggle">
+                      <label>فرش جلد</label>
+                      <label class="glass-switch compact">
+                        <input type="checkbox" id="leather" name="Leather" checked />
+                        <span class="switch-track"><span class="switch-thumb"></span></span>
+                        <span class="switch-label" id="leatherLabel">نعم</span>
+                      </label>
+                    </div>
+
+                    <div class="mini-toggle">
+                      <label>مقود يمين</label>
+                      <label class="glass-switch compact">
+                        <input type="checkbox" id="wheel" name="Wheel" />
+                        <span class="switch-track"><span class="switch-thumb"></span></span>
+                        <span class="switch-label" id="wheelLabel">يسار</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -300,15 +249,13 @@
           </form>
         </div>
 
-        <!-- Right Sticky Result & Explainability Panel -->
+        <!-- Sticky Price & Breakdown Panel -->
         <aside class="result-column">
-          <!-- Main Price Output Glass Card -->
           <div class="glass-card liquid-surface price-card" data-specular>
-            <div class="price-glow" aria-hidden="true"></div>
             <div class="price-top">
-              <span class="tag-pill">السعر التقديري المتوقع</span>
+              <span class="tag-pill">القيمة التقديرية</span>
               <button type="button" id="copyPriceBtn" class="icon-btn small liquid-pill" title="نسخ التقييم">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
                 </svg>
               </button>
@@ -321,7 +268,7 @@
 
             <div class="confidence-box">
               <div class="conf-header">
-                <span>النطاق الإحصائي المرجح (68% CI)</span>
+                <span>النطاق السعري المرجح</span>
                 <span class="mono" id="logPredVal">ln(y) = 9.874</span>
               </div>
               <div class="conf-range">
@@ -336,22 +283,19 @@
 
             <div class="summary-pills" id="carSummaryPills"></div>
 
-            <div class="card-footer-actions">
-              <button type="button" id="saveCompareBtn" class="primary-glass-btn">
-                <span>إرسال للمقارنة (سيارة A / B)</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-                </svg>
-              </button>
-            </div>
+            <button type="button" id="saveCompareBtn" class="primary-glass-btn">
+              <span>إضافة للمقارنة (A / B)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+              </svg>
+            </button>
           </div>
 
-          <!-- Feature Contribution Breakdown (Explainable AI) -->
           <div class="glass-card liquid-surface breakdown-card" data-specular>
             <div class="card-header compact">
               <div>
-                <h3>تحليل العوامل المؤثرة على السعر</h3>
-                <p>مساهمة كل خاصية مقارنة بمتوسط السوق في الموديل</p>
+                <h3>تأثير المواصفات على السعر</h3>
+                <p>أهم العوامل التي رفعت أو خفضت التقييم</p>
               </div>
             </div>
             <div class="contributions-list" id="contributionsList"></div>
@@ -360,16 +304,16 @@
       </div>
     </section>
 
-    <!-- TAB 2: SIDE-BY-SIDE COMPARISON -->
+    <!-- TAB 2: COMPARISON -->
     <section id="tab-compare" class="tab-panel">
       <div class="glass-card liquid-surface compare-header-card" data-specular>
         <div>
-          <h2>مقارنة ذكية بين سيارتين</h2>
-          <p>قارن بين مواصفات وأسعار سيارتين جنباً إلى جنب لمعرفة الفارق السعري الدقيق وفق معاملات الموديل</p>
+          <h2>مقارنة بين سيارتين</h2>
+          <p>قارن الفارق السعري والمواصفات جنباً إلى جنب</p>
         </div>
         <div class="compare-actions">
-          <button type="button" id="loadCurrentToA" class="liquid-pill action-chip">نسخ السيارة الحالية إلى A</button>
-          <button type="button" id="loadCurrentToB" class="liquid-pill action-chip">نسخ السيارة الحالية إلى B</button>
+          <button type="button" id="loadCurrentToA" class="liquid-pill action-chip">حفظ الحالية في A</button>
+          <button type="button" id="loadCurrentToB" class="liquid-pill action-chip">حفظ الحالية في B</button>
         </div>
       </div>
 
@@ -380,28 +324,28 @@
       </div>
     </section>
 
-    <!-- TAB 3: MODEL DIAGNOSTICS & ARCHITECTURE -->
+    <!-- TAB 3: DIAGNOSTICS -->
     <section id="tab-diagnostics" class="tab-panel">
       <div class="metrics-row">
         <div class="glass-card liquid-surface metric-tile" data-specular>
-          <span class="metric-label">معامل التحديد (Test R² Log)</span>
+          <span class="metric-label">معامل التحديد (Test R²)</span>
           <span class="metric-value">0.525</span>
-          <span class="metric-sub">Train R² = 0.509 (بدون Overfitting)</span>
+          <span class="metric-sub">Train R² = 0.509</span>
         </div>
         <div class="glass-card liquid-surface metric-tile" data-specular>
-          <span class="metric-label">متوسط الخطأ المطلق (MAE)</span>
+          <span class="metric-label">متوسط الخطأ (MAE)</span>
           <span class="metric-value">$6,878</span>
-          <span class="metric-sub">على مجموعة الاختبار (20% Test Split)</span>
+          <span class="metric-sub">على 20% بيانات اختبار</span>
         </div>
         <div class="glass-card liquid-surface metric-tile" data-specular>
-          <span class="metric-label">حجم البيانات النظيفة</span>
+          <span class="metric-label">حجم العينة</span>
           <span class="metric-value">13,174</span>
-          <span class="metric-sub">من أصل 19,237 سجل بعد إزالة الشواذ</span>
+          <span class="metric-sub">سجل نظيف بعد الفلترة</span>
         </div>
         <div class="glass-card liquid-surface metric-tile" data-specular>
-          <span class="metric-label">عدد المتغيرات (Features)</span>
+          <span class="metric-label">المتغيرات</span>
           <span class="metric-value">91</span>
-          <span class="metric-sub">7 رقمية معيارية + 84 متغير فئوي</span>
+          <span class="metric-sub">7 رقمية + 84 فئوية</span>
         </div>
       </div>
 
@@ -409,48 +353,44 @@
         <div class="glass-card liquid-surface diag-image-card" data-specular>
           <div class="card-header">
             <div>
-              <h3>رسومات فحص أداء النموذج (Model Diagnostics)</h3>
-              <p>مقارنة القيم الحقيقية بالمتوقعة وتوزيع البواقي (Residuals) في النطاق اللوغاريتمي</p>
+              <h3>توزيع البواقي ودقة التوقع</h3>
+              <p>Actual vs Predicted &amp; Residuals Distribution</p>
             </div>
           </div>
           <div class="diag-img-frame">
-            <img src="assets/model_diagnostics.png" alt="Model Diagnostics: Actual vs Predicted, Residuals vs Predicted, Residuals Histogram" loading="lazy" />
+            <img src="assets/model_diagnostics.png" alt="Model Diagnostics" loading="lazy" />
           </div>
         </div>
 
         <div class="glass-card liquid-surface pipeline-card" data-specular>
           <div class="card-header">
             <div>
-              <h3>خطوات المعالجة والنمذجة (ML Pipeline)</h3>
-              <p>نفس الخطوات البرمجية المنفذة في Python & Scikit-Learn</p>
+              <h3>منهجية الحساب</h3>
+              <p>خطوات معالجة البيانات قبل التنبؤ</p>
             </div>
           </div>
           <ol class="pipeline-steps">
             <li>
-              <strong>تنظيف البيانات وإزالة القيم الشاذة:</strong>
-              <span>حصر الأسعار بين $2,000 و $100,000، والمسافات أقل من 500,000 كم، وعمر السيارة حتى 40 عاماً.</span>
+              <strong>حساب عمر السيارة ديناميكياً:</strong>
+              <span>احتساب العمر الفعلي نسبة لسنة 2026 مع مواءمته مع نطاق التدريب القياسي.</span>
             </li>
             <li>
-              <strong>هندسة الميزات (Feature Engineering):</strong>
-              <span>استخراج <code>Turbo</code> من حجم المحرك، تحويل <code>Doors</code>، وحساب <code>Car age = 2020 - Prod. year</code>.</span>
+              <strong>التحويل اللوغاريتمي (Log1p):</strong>
+              <span>تقليل انحراف المسافات المقطوعة والأسعار لتحقيق استقرار التوقع.</span>
             </li>
             <li>
-              <strong>معالجة الانحراف (Log Transformation):</strong>
-              <span>تطبيق <code>log1p</code> على كل من <code>Mileage</code> و <code>Price</code> لتقليل التشتت وتحقيق التوزيع الطبيعي.</span>
+              <strong>التوحيد القياسي (StandardScaler):</strong>
+              <span>معايرة القيم الرقمية باستخدام المتوسط والانحراف المعياري لعينة التدريب.</span>
             </li>
             <li>
-              <strong>التوحيد القياسي والترميز:</strong>
-              <span>تطبيق <code>StandardScaler</code> على 7 أعمدة رقمية و <code>One-Hot Encoding</code> على 5 أعمدة فئوية.</span>
+              <strong>الترميز الفئوي (One-Hot Encoding):</strong>
+              <span>تمثيل 61 شركة تصنيع و11 فئة هيكل و7 أنواع وقود بدقة.</span>
             </li>
           </ol>
         </div>
       </div>
     </section>
   </main>
-
-  <footer class="glass-footer">
-    <p>AutoValuate AI • مدعوم بنموذج Linear Regression • جاهز للنشر على GitHub &amp; Vercel</p>
-  </footer>
 
   <div id="toast" class="glass-toast" role="status" aria-live="polite"></div>
 
