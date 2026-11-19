@@ -1,9 +1,10 @@
 /* ==========================================================================
    CarPulse — Client-Side Linear Regression Engine & Liquid Glass UI
-   With Cascading Domain Filters & Engineering Sanity Constraints
+   Comprehensive Domain Taxonomy (All 61 Manufacturers), Sanity Guards & EGP Display
    ========================================================================== */
 
 const REFERENCE_YEAR = 2026;
+const DEFAULT_USD_TO_EGP = 49.5;
 
 const MANUFACTURERS = [
   "ACURA", "ALFA ROMEO", "ASTON MARTIN", "AUDI", "BMW", "BUICK", "CADILLAC",
@@ -30,22 +31,98 @@ const GEAR_BOXES = [
   "Automatic", "Manual", "Tiptronic", "Variator"
 ];
 
-// Cascading rules: Manufacturer -> allowed Categories
+// Complete Brand -> Allowed Body Categories mapping across ALL 61 manufacturers
 const BRAND_CATEGORIES = {
-  "FERRARI": ["Coupe", "Cabriolet"],
+  "ACURA": ["Sedan", "Jeep", "Coupe", "Hatchback"],
+  "ALFA ROMEO": ["Sedan", "Hatchback", "Coupe", "Cabriolet", "Jeep"],
   "ASTON MARTIN": ["Coupe", "Cabriolet", "Sedan"],
-  "TESLA": ["Sedan", "Jeep", "Hatchback", "Coupe"],
-  "JEEP": ["Jeep", "Pickup"],
+  "AUDI": ["Sedan", "Jeep", "Hatchback", "Coupe", "Cabriolet", "Universal"],
+  "BMW": ["Sedan", "Jeep", "Coupe", "Cabriolet", "Hatchback", "Universal"],
+  "BUICK": ["Sedan", "Jeep", "Minivan", "Coupe", "Cabriolet"],
+  "CADILLAC": ["Sedan", "Jeep", "Coupe", "Limousine", "Universal"],
+  "CHEVROLET": ["Sedan", "Jeep", "Hatchback", "Pickup", "Coupe", "Cabriolet", "Minivan", "Microbus"],
+  "CHRYSLER": ["Sedan", "Minivan", "Cabriolet", "Coupe", "Limousine", "Universal"],
+  "CITROEN": ["Hatchback", "Sedan", "Minivan", "Microbus", "Goods wagon", "Universal", "Jeep"],
+  "DAEWOO": ["Sedan", "Hatchback", "Universal", "Minivan"],
+  "DAIHATSU": ["Hatchback", "Jeep", "Minivan", "Microbus", "Pickup"],
+  "DODGE": ["Sedan", "Jeep", "Pickup", "Minivan", "Coupe", "Hatchback"],
+  "FERRARI": ["Coupe", "Cabriolet"],
+  "FIAT": ["Hatchback", "Sedan", "Minivan", "Microbus", "Goods wagon", "Cabriolet", "Jeep"],
+  "FORD": ["Sedan", "Jeep", "Hatchback", "Pickup", "Minivan", "Microbus", "Goods wagon", "Coupe", "Cabriolet", "Universal"],
+  "GAZ": ["Sedan", "Pickup", "Microbus", "Goods wagon", "Universal"],
+  "GMC": ["Jeep", "Pickup", "Minivan", "Microbus", "Goods wagon"],
+  "GREATWALL": ["Jeep", "Pickup", "Sedan", "Hatchback"],
+  "HAVAL": ["Jeep", "Pickup"],
+  "HONDA": ["Sedan", "Jeep", "Hatchback", "Minivan", "Coupe", "Universal"],
   "HUMMER": ["Jeep", "Pickup"],
+  "HYUNDAI": ["Sedan", "Jeep", "Hatchback", "Minivan", "Microbus", "Coupe", "Universal"],
+  "INFINITI": ["Sedan", "Jeep", "Coupe", "Cabriolet"],
+  "ISUZU": ["Pickup", "Jeep", "Microbus", "Goods wagon"],
+  "JAGUAR": ["Sedan", "Jeep", "Coupe", "Cabriolet", "Universal"],
+  "JEEP": ["Jeep", "Pickup"],
+  "KIA": ["Sedan", "Jeep", "Hatchback", "Minivan", "Coupe", "Universal"],
+  "LANCIA": ["Hatchback", "Sedan", "Minivan", "Universal", "Cabriolet"],
   "LAND ROVER": ["Jeep"],
-  "PORSCHE": ["Jeep", "Coupe", "Cabriolet", "Sedan"],
-  "MINI": ["Hatchback", "Cabriolet", "Jeep", "Universal"],
-  "GAZ": ["Pickup", "Microbus", "Goods wagon", "Sedan"],
+  "LEXUS": ["Sedan", "Jeep", "Coupe", "Cabriolet", "Hatchback"],
+  "LINCOLN": ["Sedan", "Jeep", "Limousine", "Coupe"],
+  "MASERATI": ["Sedan", "Jeep", "Coupe", "Cabriolet"],
+  "MAZDA": ["Sedan", "Jeep", "Hatchback", "Minivan", "Pickup", "Coupe", "Cabriolet", "Universal"],
+  "MERCEDES-BENZ": ["Sedan", "Jeep", "Coupe", "Cabriolet", "Hatchback", "Minivan", "Microbus", "Goods wagon", "Limousine", "Universal"],
+  "MERCURY": ["Sedan", "Jeep", "Minivan", "Coupe", "Universal"],
+  "MINI": ["Hatchback", "Cabriolet", "Jeep", "Universal", "Coupe"],
+  "MITSUBISHI": ["Jeep", "Sedan", "Pickup", "Hatchback", "Minivan", "Microbus", "Universal"],
+  "NISSAN": ["Sedan", "Jeep", "Hatchback", "Pickup", "Minivan", "Microbus", "Coupe", "Universal"],
+  "OPEL": ["Sedan", "Hatchback", "Universal", "Minivan", "Microbus", "Goods wagon", "Jeep", "Cabriolet"],
+  "PEUGEOT": ["Hatchback", "Sedan", "Universal", "Minivan", "Microbus", "Goods wagon", "Jeep", "Cabriolet"],
+  "PONTIAC": ["Sedan", "Coupe", "Hatchback", "Minivan", "Cabriolet"],
+  "PORSCHE": ["Jeep", "Coupe", "Cabriolet", "Sedan", "Universal"],
+  "RENAULT": ["Sedan", "Hatchback", "Universal", "Minivan", "Microbus", "Goods wagon", "Jeep"],
+  "ROVER": ["Sedan", "Hatchback", "Universal", "Jeep", "Cabriolet"],
+  "SAAB": ["Sedan", "Universal", "Cabriolet", "Coupe"],
+  "SATURN": ["Sedan", "Jeep", "Coupe", "Universal", "Minivan"],
+  "SCION": ["Hatchback", "Coupe", "Sedan", "Minivan"],
+  "SEAT": ["Hatchback", "Sedan", "Universal", "Minivan", "Jeep"],
+  "SKODA": ["Sedan", "Hatchback", "Universal", "Jeep", "Minivan"],
+  "SSANGYONG": ["Jeep", "Pickup", "Minivan"],
+  "SUBARU": ["Sedan", "Universal", "Jeep", "Hatchback", "Coupe"],
+  "SUZUKI": ["Jeep", "Hatchback", "Sedan", "Minivan", "Microbus", "Pickup"],
+  "TESLA": ["Sedan", "Jeep", "Hatchback", "Coupe"],
+  "TOYOTA": ["Sedan", "Jeep", "Hatchback", "Pickup", "Minivan", "Microbus", "Coupe", "Universal"],
   "UAZ": ["Jeep", "Pickup", "Microbus"],
   "VAZ": ["Sedan", "Hatchback", "Universal", "Jeep"],
+  "VOLKSWAGEN": ["Sedan", "Hatchback", "Universal", "Jeep", "Minivan", "Microbus", "Goods wagon", "Pickup", "Cabriolet"],
+  "VOLVO": ["Sedan", "Universal", "Jeep", "Hatchback", "Coupe", "Cabriolet"],
   "ZAZ": ["Sedan", "Hatchback"],
-  "ISUZU": ["Pickup", "Jeep", "Microbus", "Goods wagon"],
-  "GMC": ["Jeep", "Pickup", "Minivan", "Microbus"]
+  "სხვა": CATEGORIES
+};
+
+// Complete Brand -> Allowed Fuel Types mapping
+const BRAND_FUEL_TYPES = {
+  "TESLA": ["Plug-in Hybrid", "Hybrid"],
+  "FERRARI": ["Petrol", "Hybrid", "Plug-in Hybrid"],
+  "ASTON MARTIN": ["Petrol"],
+  "PORSCHE": ["Petrol", "Diesel", "Hybrid", "Plug-in Hybrid"],
+  "JAGUAR": ["Petrol", "Diesel", "Hybrid", "Plug-in Hybrid"],
+  "LAND ROVER": ["Diesel", "Petrol", "Hybrid", "Plug-in Hybrid"],
+  "HUMMER": ["Petrol", "Diesel"],
+  "JEEP": ["Petrol", "Diesel", "Hybrid", "Plug-in Hybrid", "LPG"],
+  "UAZ": ["Petrol", "Diesel", "LPG", "CNG"],
+  "VAZ": ["Petrol", "LPG", "CNG"],
+  "ZAZ": ["Petrol", "LPG", "CNG"],
+  "GAZ": ["Petrol", "Diesel", "LPG", "CNG"],
+  "ISUZU": ["Diesel", "Petrol"]
+};
+
+// Complete Brand -> Allowed Gearboxes mapping
+const BRAND_GEAR_BOXES = {
+  "TESLA": ["Automatic"],
+  "FERRARI": ["Automatic", "Tiptronic"],
+  "ASTON MARTIN": ["Automatic", "Tiptronic", "Manual"],
+  "ROLLS-ROYCE": ["Automatic"],
+  "HUMMER": ["Automatic", "Tiptronic"],
+  "UAZ": ["Manual", "Automatic"],
+  "VAZ": ["Manual", "Automatic", "Variator"],
+  "ZAZ": ["Manual", "Automatic"]
 };
 
 // Default drivetrain per Manufacturer when changed
@@ -56,8 +133,15 @@ const BRAND_DEFAULT_DRIVE = {
   "UAZ": "4x4",
   "SUBARU": "4x4",
   "TESLA": "4x4",
+  "GREATWALL": "4x4",
+  "HAVAL": "4x4",
+  "SSANGYONG": "4x4",
   "FERRARI": "Rear",
-  "ASTON MARTIN": "Rear"
+  "ASTON MARTIN": "Rear",
+  "MASERATI": "Rear",
+  "JAGUAR": "Rear",
+  "BMW": "Rear",
+  "MERCEDES-BENZ": "Rear"
 };
 
 // Default drivetrain per Category when changed
@@ -170,11 +254,21 @@ let compareSlotB = { ...PRESETS.bmw };
 let nextCompareSlot = "B";
 let displayedPrice = 0;
 let animFrameId = null;
+let usdToEgpRate = DEFAULT_USD_TO_EGP;
 
 // ==========================================================================
 // 1. Initialization
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", async () => {
+  const savedRate = Number(localStorage.getItem("carpulse_usd_egp_rate"));
+  if (savedRate && savedRate > 0) {
+    usdToEgpRate = savedRate;
+  }
+  const rateInput = document.getElementById("usdToEgpRate");
+  if (rateInput) {
+    rateInput.value = usdToEgpRate.toFixed(2);
+  }
+
   populateDropdowns();
   initSpecularGlassEffect();
   bindUIEvents();
@@ -192,25 +286,53 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-function populateDropdowns() {
-  fillSelect("manufacturer", MANUFACTURERS, (val) =>
-    val === "სხვა" ? "Other (أخرى)" : val
-  );
-  syncCategoryOptionsForBrand(currentState.Manufacturer, currentState.Category);
-  fillSelect("fuelType", FUEL_TYPES);
-  fillSelect("gearBox", GEAR_BOXES);
+function getUsdToEgpRate() {
+  const input = document.getElementById("usdToEgpRate");
+  const val = input ? Number(input.value) : usdToEgpRate;
+  return val > 0 ? val : DEFAULT_USD_TO_EGP;
+}
+
+function formatApproxEgp(usdAmount) {
+  const egp = Math.round(usdAmount * getUsdToEgpRate());
+  return `≈ ${egp.toLocaleString("en-US")} ج.م`;
 }
 
 function getAllowedCategories(manufacturer) {
   return BRAND_CATEGORIES[manufacturer] || CATEGORIES;
 }
 
-function syncCategoryOptionsForBrand(manufacturer, preferredCategory) {
-  const allowed = getAllowedCategories(manufacturer);
-  fillSelect("category", allowed);
-  const nextCat = allowed.includes(preferredCategory) ? preferredCategory : allowed[0];
+function getAllowedFuelTypes(manufacturer) {
+  return BRAND_FUEL_TYPES[manufacturer] || FUEL_TYPES;
+}
+
+function getAllowedGearBoxes(manufacturer) {
+  return BRAND_GEAR_BOXES[manufacturer] || GEAR_BOXES;
+}
+
+function syncBrandDropdowns(manufacturer, state) {
+  const allowedCats = getAllowedCategories(manufacturer);
+  fillSelect("category", allowedCats);
+  const nextCat = allowedCats.includes(state.Category) ? state.Category : allowedCats[0];
   document.getElementById("category").value = nextCat;
-  return nextCat;
+
+  const allowedFuels = getAllowedFuelTypes(manufacturer);
+  fillSelect("fuelType", allowedFuels);
+  const nextFuel = allowedFuels.includes(state.FuelType) ? state.FuelType : allowedFuels[0];
+  document.getElementById("fuelType").value = nextFuel;
+
+  const allowedGears = getAllowedGearBoxes(manufacturer);
+  fillSelect("gearBox", allowedGears);
+  const nextGear = allowedGears.includes(state.GearBox) ? state.GearBox : allowedGears[0];
+  document.getElementById("gearBox").value = nextGear;
+
+  return { Category: nextCat, FuelType: nextFuel, GearBox: nextGear };
+}
+
+function populateDropdowns() {
+  fillSelect("manufacturer", MANUFACTURERS, (val) =>
+    val === "სხვა" ? "Other (أخرى)" : val
+  );
+  syncBrandDropdowns(currentState.Manufacturer, currentState);
 }
 
 function fillSelect(id, items, labelFn = (v) => v) {
@@ -221,21 +343,40 @@ function fillSelect(id, items, labelFn = (v) => v) {
 }
 
 // ==========================================================================
-// 2. Engineering Filter & Sanity Guard
+// 2. Engineering Filter & Sanity Guard (All Brands, Categories, Fuel, Engine, Age)
 // ==========================================================================
 function enforceEngineeringFilters(state, opts = {}) {
   const { syncDrive = "none", notifyOnAdjust = false } = opts;
   const next = { ...state };
   const notes = [];
 
-  // 1) Manufacturer -> Category cascading filter
+  // 1) Manufacturer -> Category cascading filter across all 61 brands
   const allowedCats = getAllowedCategories(next.Manufacturer);
   if (!allowedCats.includes(next.Category)) {
     next.Category = allowedCats[0];
-    notes.push(`تم ضبط الفئة تلقائياً إلى ${next.Category} لتناسب ${next.Manufacturer}`);
+    notes.push(`تم ضبط الفئة إلى ${next.Category} لتناسب ${next.Manufacturer}`);
   }
 
-  // 2) Cylinders sane range relative to EngineVolume
+  // 2) Manufacturer -> FuelType cascading filter
+  const allowedFuels = getAllowedFuelTypes(next.Manufacturer);
+  if (!allowedFuels.includes(next.FuelType)) {
+    next.FuelType = allowedFuels[0];
+    notes.push(`تم ضبط الوقود إلى ${next.FuelType} لتناسب ${next.Manufacturer}`);
+  }
+
+  // 3) Manufacturer -> GearBox cascading filter
+  const allowedGears = getAllowedGearBoxes(next.Manufacturer);
+  if (!allowedGears.includes(next.GearBox)) {
+    next.GearBox = allowedGears[0];
+    notes.push(`تم ضبط ناقل الحركة إلى ${next.GearBox} لتناسب ${next.Manufacturer}`);
+  }
+
+  // 4) Category -> Doors alignment (Coupe/Cabriolet default to 2 doors if currently 5)
+  if ((next.Category === "Coupe" || next.Category === "Cabriolet") && Number(next.Doors) === 5) {
+    next.Doors = 2;
+  }
+
+  // 5) Cylinders sane range relative to EngineVolume
   const vol = Number(next.EngineVolume);
   let minCyl = 3;
   let maxCyl = 12;
@@ -259,7 +400,7 @@ function enforceEngineeringFilters(state, opts = {}) {
     notes.push(`تم ضبط السلندرات إلى ${next.Cylinders} لسعة محرك ${vol.toFixed(1)}L`);
   }
 
-  // 3) Mileage sanity relative to car age (year 2026)
+  // 6) Mileage sanity relative to car age (year 2026)
   const age = Math.max(0, REFERENCE_YEAR - Number(next.ProdYear));
   const maxSaneMileage = age === 0 ? 35000 : Math.min(499000, age * 55000 + 20000);
   const minSaneMileage = age >= 5 ? 5000 : 500;
@@ -271,9 +412,13 @@ function enforceEngineeringFilters(state, opts = {}) {
     next.Mileage = minSaneMileage;
   }
 
-  // 4) Drivetrain alignment based on what changed
-  if (syncDrive === "brand" && BRAND_DEFAULT_DRIVE[next.Manufacturer]) {
-    next.DriveWheels = BRAND_DEFAULT_DRIVE[next.Manufacturer];
+  // 7) Drivetrain alignment based on brand or category
+  if (syncDrive === "brand") {
+    if (BRAND_DEFAULT_DRIVE[next.Manufacturer]) {
+      next.DriveWheels = BRAND_DEFAULT_DRIVE[next.Manufacturer];
+    } else if (CATEGORY_DEFAULT_DRIVE[next.Category]) {
+      next.DriveWheels = CATEGORY_DEFAULT_DRIVE[next.Category];
+    }
   } else if (syncDrive === "category" && CATEGORY_DEFAULT_DRIVE[next.Category]) {
     next.DriveWheels = CATEGORY_DEFAULT_DRIVE[next.Category];
   }
@@ -407,11 +552,21 @@ function updatePrediction() {
   const result = predictCarPrice(currentState);
   if (!result) return;
 
-  animatePriceCounter(Math.round(result.price));
+  const roundedUsd = Math.round(result.price);
+  const roundedLow = Math.round(result.priceLow);
+  const roundedHigh = Math.round(result.priceHigh);
+  const rate = getUsdToEgpRate();
 
+  animatePriceCounter(roundedUsd);
+
+  document.getElementById("predictedPriceEgp").textContent = formatApproxEgp(roundedUsd);
   document.getElementById("logPredVal").textContent = `ln(y) = ${result.logPred.toFixed(3)}`;
-  document.getElementById("priceLow").textContent = `$${Math.round(result.priceLow).toLocaleString("en-US")}`;
-  document.getElementById("priceHigh").textContent = `$${Math.round(result.priceHigh).toLocaleString("en-US")}`;
+  document.getElementById("priceLow").textContent = `$${roundedLow.toLocaleString("en-US")}`;
+  document.getElementById("priceHigh").textContent = `$${roundedHigh.toLocaleString("en-US")}`;
+
+  const egpLow = Math.round(roundedLow * rate).toLocaleString("en-US");
+  const egpHigh = Math.round(roundedHigh * rate).toLocaleString("en-US");
+  document.getElementById("priceRangeEgp").textContent = `تقريباً: ${egpLow} — ${egpHigh} ج.م`;
 
   const pillsContainer = document.getElementById("carSummaryPills");
   const tags = [
@@ -477,14 +632,14 @@ function renderContributions(items) {
 // ==========================================================================
 function applyStateToForm(state) {
   document.getElementById("manufacturer").value = state.Manufacturer;
-  const activeCat = syncCategoryOptionsForBrand(state.Manufacturer, state.Category);
-  state.Category = activeCat;
+  const synced = syncBrandDropdowns(state.Manufacturer, state);
+  state.Category = synced.Category;
+  state.FuelType = synced.FuelType;
+  state.GearBox = synced.GearBox;
 
   document.getElementById("prodYear").value = state.ProdYear;
   document.getElementById("engineVolume").value = state.EngineVolume;
   document.getElementById("cylinders").value = state.Cylinders;
-  document.getElementById("fuelType").value = state.FuelType;
-  document.getElementById("gearBox").value = state.GearBox;
   document.getElementById("mileage").value = state.Mileage;
   document.getElementById("levy").value = state.Levy;
   document.getElementById("airbags").value = state.Airbags;
@@ -526,6 +681,19 @@ function bindUIEvents() {
     advBtn.setAttribute("aria-expanded", String(!isExpanded));
     advPanel.hidden = isExpanded;
   });
+
+  const rateInput = document.getElementById("usdToEgpRate");
+  if (rateInput) {
+    rateInput.addEventListener("input", () => {
+      const val = Number(rateInput.value);
+      if (val > 0) {
+        usdToEgpRate = val;
+        localStorage.setItem("carpulse_usd_egp_rate", String(val));
+        updatePrediction();
+        renderComparison();
+      }
+    });
+  }
 
   document.getElementById("manufacturer").addEventListener("change", (e) => {
     currentState.Manufacturer = e.target.value;
@@ -634,7 +802,8 @@ function bindUIEvents() {
 
   document.getElementById("copyPriceBtn").addEventListener("click", () => {
     const priceText = document.getElementById("predictedPrice").textContent;
-    const summary = `${currentState.Manufacturer} (${currentState.ProdYear}) - التقييم: $${priceText}`;
+    const egpText = document.getElementById("predictedPriceEgp").textContent;
+    const summary = `${currentState.Manufacturer} (${currentState.ProdYear}) - التقييم: $${priceText} (${egpText})`;
     navigator.clipboard?.writeText(summary);
     showToast("تم نسخ التقييم");
   });
@@ -703,7 +872,9 @@ function renderComparison() {
   document.getElementById("compareCardB").innerHTML = buildCompareColumnHTML("السيارة B", compareSlotB, resB);
 
   const diff = resB.price - resA.price;
-  const absDiff = Math.abs(Math.round(diff)).toLocaleString("en-US");
+  const absUsd = Math.abs(Math.round(diff));
+  const absDiff = absUsd.toLocaleString("en-US");
+  const absEgpDiff = Math.round(absUsd * getUsdToEgpRate()).toLocaleString("en-US");
   const pct = ((Math.abs(diff) / Math.min(resA.price, resB.price)) * 100).toFixed(1);
   const higher = diff >= 0 ? "السيارة B أعلى سعراً بـ" : "السيارة A أعلى سعراً بـ";
 
@@ -711,6 +882,7 @@ function renderComparison() {
     <div class="vs-badge">VS</div>
     <span class="tag-pill">${higher}</span>
     <div class="diff-amount">$${absDiff}</div>
+    <div class="diff-amount-egp">≈ ${absEgpDiff} ج.م</div>
     <p style="color: var(--text-secondary); font-size: 0.88rem;">
       فارق بنسبة <strong>${pct}%</strong> وفق معاملات التقييم.
     </p>
@@ -718,11 +890,13 @@ function renderComparison() {
 }
 
 function buildCompareColumnHTML(badge, car, res) {
+  const roundedUsd = Math.round(res.price);
   return `
     <span class="tag-pill">${badge}</span>
     <h3 style="margin-top: 12px;">${car.Manufacturer} (${car.ProdYear})</h3>
     <p style="color: var(--text-secondary); font-size: 0.84rem;">${car.Category} • ${car.FuelType}</p>
-    <div class="compare-price">$${Math.round(res.price).toLocaleString("en-US")}</div>
+    <div class="compare-price">$${roundedUsd.toLocaleString("en-US")}</div>
+    <div class="compare-price-egp">${formatApproxEgp(roundedUsd)}</div>
     <ul class="compare-specs-list">
       <li><span>سعة المحرك</span><strong>${Number(car.EngineVolume).toFixed(1)}L ${car.Turbo ? "(Turbo)" : ""}</strong></li>
       <li><span>ناقل الحركة</span><strong>${car.GearBox}</strong></li>

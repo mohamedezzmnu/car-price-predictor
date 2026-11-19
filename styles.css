@@ -806,7 +806,7 @@ body.light-glass .advanced-panel {
   align-items: baseline;
   justify-content: center;
   gap: 4px;
-  margin: 20px 0 16px;
+  margin: 18px 0 12px;
   direction: ltr;
 }
 
@@ -823,6 +823,80 @@ body.light-glass .advanced-panel {
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
+}
+
+/* Approximate EGP Conversion Box */
+.egp-conversion-box {
+  padding: 11px 14px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.light-glass .egp-conversion-box {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.egp-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.egp-approx-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.egp-price-val {
+  font-family: var(--font-ar);
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--positive);
+}
+
+.egp-rate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--glass-border);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.rate-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  direction: ltr;
+  font-family: var(--font-en);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.rate-input-wrap input {
+  width: 68px;
+  padding: 3px 7px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border-strong);
+  background: var(--glass-input-bg);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.rate-input-wrap input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
 }
 
 .confidence-box {
@@ -858,6 +932,13 @@ body.light-glass .confidence-box {
   font-family: var(--font-en);
   font-size: 0.83rem;
   font-weight: 600;
+}
+
+.conf-range-egp {
+  margin-top: 7px;
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--text-muted);
 }
 
 .conf-bar {
@@ -1042,9 +1123,16 @@ body.light-glass .contrib-track {
   font-family: var(--font-en);
   font-size: 2rem;
   font-weight: 700;
-  margin: 10px 0 16px;
+  margin: 10px 0 2px;
   direction: ltr;
   text-align: right;
+}
+
+.compare-price-egp {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--positive);
+  margin-bottom: 14px;
 }
 
 .compare-specs-list {
@@ -1093,6 +1181,12 @@ body.light-glass .compare-specs-list li {
   font-size: 1.75rem;
   font-weight: 700;
   direction: ltr;
+}
+
+.diff-amount-egp {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--positive);
 }
 
 .metrics-row {

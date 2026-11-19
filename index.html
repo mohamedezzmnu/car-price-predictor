@@ -266,6 +266,22 @@
               <span class="price-number" id="predictedPrice">19,420</span>
             </div>
 
+            <!-- Approximate EGP Conversion Bar -->
+            <div class="egp-conversion-box">
+              <div class="egp-main-row">
+                <span class="egp-approx-badge">تقريباً بالمصري</span>
+                <span class="egp-price-val" id="predictedPriceEgp">≈ 961,290 ج.م</span>
+              </div>
+              <div class="egp-rate-row">
+                <label for="usdToEgpRate">سعر الصرف (قابل للتعديل):</label>
+                <div class="rate-input-wrap">
+                  <span>1$ =</span>
+                  <input type="number" id="usdToEgpRate" value="49.50" min="1" max="500" step="0.1" aria-label="سعر صرف الدولار مقابل الجنيه المصري" />
+                  <span>ج.م</span>
+                </div>
+              </div>
+            </div>
+
             <div class="confidence-box">
               <div class="conf-header">
                 <span>النطاق السعري المرجح</span>
@@ -279,6 +295,7 @@
                 </div>
                 <span id="priceHigh">$32,180</span>
               </div>
+              <div class="conf-range-egp" id="priceRangeEgp">تقريباً: 580,140 — 1,592,910 ج.م</div>
             </div>
 
             <div class="summary-pills" id="carSummaryPills"></div>
